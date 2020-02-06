@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+		logicalFilePath="feature-api.xml">
+	<changeSet id="feature-api-test.xml" author="Alex Misha" context="test">
+		<tagDatabase tag="feature-api-test.xml" />
+	</changeSet>
+
+	<changeSet id="create-feature-api-test-data" author="Alex Misha" context="test">
+		<sql>
+			insert into operator (id, login, first_name, last_name, middle_name)
+			values (nextval('sq_operator'), 'user1', 'Иванов', 'Иван', 'Иваныч');
+
+			insert into operator (id, login, first_name, last_name)
+			values (nextval('sq_operator'), 'user2', 'Фред', 'Люпински');
+
+			insert into operator_password(id, password, operator_id)
+			values (nextval('sq_operator_password'), 'hashsum', (currval('sq_operator') - 1));
+
+			insert into operator_password(id, password, operator_id)
+			values (nextval('sq_operator_password'), 'hashsum', currval('sq_operator'));
+
+			insert into client (id, first_name, last_name, middle_name, phone)
+			values (nextval('sq_client'), 'Петров', 'Петр', 'Петрович', '8 911 987 57 56');
+
+			insert into client (id, first_name, last_name)
+			values (nextval('sq_client'), 'Майкл', 'Полански');
+		</sql>
+	</changeSet>
+</databaseChangeLog>
