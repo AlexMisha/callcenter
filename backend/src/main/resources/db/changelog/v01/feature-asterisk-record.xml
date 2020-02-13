@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+		logicalFilePath="feature-asterisk-record.xml">
+	<changeSet id="feature-asterisk-record.xml" author="Alex Misha" context="develop">
+		<tagDatabase tag="feature-asterisk-record.xml" />
+	</changeSet>
+
+	<changeSet id="ct.cdr" author="Alex Misha" context="develop">
+		<sqlFile path="feature-asterisk-record/cdr.sql" relativeToChangelogFile="true" />
+		<rollback>
+			<dropTable tableName="cdr" cascadeConstraints="true" />
+		</rollback>
+	</changeSet>
+	<!--<changeSet id="ct.cel" author="Alex Misha" context="develop">
+		<sqlFile path="feature-asterisk-record/cel.sql" relativeToChangelogFile="true" />
+		<rollback>
+			<dropTable tableName="cel" />
+		</rollback>
+	</changeSet>-->
+	<changeSet id="add.permissions.to.cdr" author="Alex Misha" context="develop">
+		<sql>
+			ALTER TABLE cdr OWNER TO callcenter_user;
+		</sql>
+		<rollback />
+	</changeSet>
+</databaseChangeLog>
