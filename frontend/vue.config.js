@@ -1,4 +1,7 @@
 module.exports = {
-     outputDir: 'target/dist',
-     assetsDir: 'static'
+  "outputDir": "target/dist",
+  "assetsDir": "static",
+  "transpileDependencies": [
+    "vuetify"
+  ]
 }
