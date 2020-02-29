@@ -4,10 +4,12 @@
                 app
                 color="primary"
         >
+
             <v-btn
                     class="headline"
                     rounded
-            ><v-icon>{{'call'}}</v-icon>Call Center APP</v-btn>
+            ><v-icon>{{'mdi-call'}}</v-icon>Call Center APP</v-btn>
+            <v-spacer></v-spacer>
             <v-btn
                     class="headline"
                     rounded
