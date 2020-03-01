@@ -15,6 +15,7 @@
 		<java.version>1.11</java.version>
 		<hibernate.modelgen.version>5.2.14.Final</hibernate.modelgen.version>
 		<callcenter.deploy.path>${project.build.directory}</callcenter.deploy.path>
+		<hibernate.validator.version>6.1.2.Final</hibernate.validator.version>
 	</properties>
 
 	<packaging>jar</packaging>
@@ -59,11 +60,6 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -90,6 +86,11 @@
 			<artifactId>frontend</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate.validator.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -107,16 +108,12 @@
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<source>11</source>
+						<target>11</target>
 						<compilerArguments>
 							<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
 						</compilerArguments>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-maven-plugin</artifactId>
 				</plugin>
 				<plugin>
 					<groupId>org.liquibase</groupId>
@@ -166,6 +163,21 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.shepard.callcenter.CallcenterApplication</mainClass>
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
@@ -174,7 +186,7 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<echo message="copy callcenter-${project.parent.version}.jar to ${callcenter.deploy.path}" />
+								<echo message="Deploy callcenter-${project.parent.version}.jar to ${callcenter.deploy.path}" />
 								<copy todir="${callcenter.deploy.path}" overwrite="true">
 									<fileset dir="target/">
 										<include name="callcenter-${project.parent.version}.jar" />
