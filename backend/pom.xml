@@ -14,7 +14,10 @@
 	<properties>
 		<java.version>1.11</java.version>
 		<hibernate.modelgen.version>5.2.14.Final</hibernate.modelgen.version>
+		<callcenter.deploy.path>${project.build.directory}</callcenter.deploy.path>
 	</properties>
+
+	<packaging>jar</packaging>
 
 	<repositories>
 		<repository>
@@ -90,6 +93,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>callcenter-${project.parent.version}</finalName>
 		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
 		<resources>
@@ -160,6 +164,31 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>deploy</id>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<echo message="copy callcenter-${project.parent.version}.jar to ${callcenter.deploy.path}" />
+								<copy todir="${callcenter.deploy.path}" overwrite="true">
+									<fileset dir="target/">
+										<include name="callcenter-${project.parent.version}.jar" />
+									</fileset>
+								</copy>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>
