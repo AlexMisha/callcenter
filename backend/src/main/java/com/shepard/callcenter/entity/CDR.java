@@ -61,6 +61,9 @@ public class CDR {
     @Column(name = "userfield")
     private String userField;
 
+    @Column(name = "filename")
+    private String fileName;
+
     public Long getId() {
         return id;
     }
@@ -195,5 +198,13 @@ public class CDR {
 
     public void setUserField(String userField) {
         this.userField = userField;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }
