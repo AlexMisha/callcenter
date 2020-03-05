@@ -7,9 +7,9 @@
 </template>
 
 <script>
-    import Abonent from "./components/Abonent";
-    export default {
-        name: "Calls",
-        components: {Abonent}
-    }
+import Abonent from './components/Abonent';
+export default {
+  name: 'Calls',
+  components: {Abonent},
+};
 </script>

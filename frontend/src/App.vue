@@ -48,9 +48,9 @@
 </template>
 
 <script>
-import HeadlineBar from "./components/HeadlineBar";
-import BottomBar from "./components/BottomBar";
-import Calls from "./Calls";
+import HeadlineBar from './components/HeadlineBar';
+import BottomBar from './components/BottomBar';
+import Calls from './Calls';
 
 export default {
   name: 'App',
@@ -65,7 +65,7 @@ export default {
     show: false,
     snackbar: false,
     y: 'top',
-    text: 'Неверный логин или пароль'
+    text: 'Неверный логин или пароль',
   }),
 };
 

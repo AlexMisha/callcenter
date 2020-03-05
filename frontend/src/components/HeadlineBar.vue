@@ -20,10 +20,10 @@
 </template>
 
 <script>
-    export default {
-        name: "HeadlineBar",
-        methods:{
+export default {
+  name: 'HeadlineBar',
+  methods: {
 
-        }
-    }
+  },
+};
 </script>
