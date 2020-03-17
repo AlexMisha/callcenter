@@ -31,6 +31,6 @@ jobs:
       with:
         java-version: 1.11
     - name: Start ESLint
-      run: npm --prefix ./frontend/ run lint
+        run: npm --prefix ./frontend/ run lint
     - name: Build with Maven
       run: mvn -B install -DskipTests
