@@ -7,7 +7,20 @@
       >
     </v-toolbar>
     <LoginWindow v-if="showData" />
-    <Abonent v-else />
+    <v-tabs v-else fixed-tabs>
+      <v-tab>
+        Вызвать
+      </v-tab>
+      <v-tab-item>
+        <Abonent/>
+      </v-tab-item>
+      <v-tab>
+        Звонки
+      </v-tab>
+      <v-tab-item>
+        <CDR/>
+      </v-tab-item>
+    </v-tabs>
     <BottomBar />
   </v-app>
 </template>
@@ -16,9 +29,11 @@
 import BottomBar from './components/BottomBar';
 import Abonent from './components/Abonent';
 import LoginWindow from './components/LoginWindow';
+import CDR from './components/CDR';
 export default {
   name: 'App',
   components: {
+    CDR,
     LoginWindow,
     Abonent,
     BottomBar,
