@@ -5,6 +5,7 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
+    'google',
   ],
   globals: {
     Atomics: 'readonly',

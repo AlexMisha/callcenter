@@ -44,30 +44,30 @@
 </template>
 
 <script>
-import BottomBar from "./components/BottomBar";
-const axios = require("axios");
+import BottomBar from './components/BottomBar';
+const axios = require('axios');
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    BottomBar
+    BottomBar,
   },
   data: () => ({
-    login: "",
-    password: "",
+    login: '',
+    password: '',
     showData: true,
     snackbar: false,
-    y: "top",
-    text: "Неверный логин или пароль"
+    y: 'top',
+    text: 'Неверный логин или пароль',
   }),
   methods: {
     log() {
       axios({
-        method: "POST",
-        url: "http://localhost:8080/login",
-        headers: { "Content-Type": "application/json", Accept: "*/*" },
-        data: { login: this.login, password: this.password }
-      }).then(response => console.log(JSON.stringify(response)));
-    }
-  }
+        method: 'POST',
+        url: 'http://localhost:8080/login',
+        headers: {'Content-Type': 'application/json', 'Accept': '*/*'},
+        data: {login: this.login, password: this.password},
+      }).then((response) => console.log(JSON.stringify(response)));
+    },
+  },
 };
 </script>
