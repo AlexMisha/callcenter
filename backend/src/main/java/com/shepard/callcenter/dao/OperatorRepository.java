@@ -10,5 +10,4 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
  */
 @RepositoryRestResource(path = "operators", collectionResourceRel = "operators", itemResourceRel = "operator")
 public interface OperatorRepository extends CrudRepository<Operator, Long>, JpaSpecificationExecutor<Operator> {
-    Operator findByLogin(String login);
 }
