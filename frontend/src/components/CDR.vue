@@ -22,35 +22,33 @@
 </template>
 
 <script>
-const axios = require('axios');
+const axios = require("axios");
 export default {
-  name: 'CDR',
+  name: "CDR",
   data() {
     return {
       info: null,
       headers: [
         {
-          text: 'accountCode',
-          align: 'left',
-          value: 'accountCode',
+          text: "accountCode",
+          align: "left",
+          value: "accountCode"
         },
-        {text: 'Date', value: 'callDate'},
-        {text: 'Duration', value: 'duration'},
-        {text: '', value: 'fileName', sortable: false, width: 1},
-      ],
+        { text: "Date", value: "callDate" },
+        { text: "Duration", value: "duration" },
+        { text: "", value: "fileName", sortable: false, width: 1 }
+      ]
     };
   },
   mounted() {
     axios
-        .get('http://localhost:8080/api/cdr')
-        .then(
-            (response) => (this.info = response.data._embedded),
-        );
+      .get("http://localhost:8080/api/cdr")
+      .then(response => (this.info = response.data._embedded));
   },
   methods: {
     download(filename) {
-      window.open('http://localhost:8080/downloadCallRecord/'+filename);
-    },
-  },
+      window.open("http://localhost:8080/downloadCallRecord/" + filename);
+    }
+  }
 };
 </script>

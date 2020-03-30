@@ -26,12 +26,7 @@
         @click:append="show = !show"
       />
 
-      <v-btn
-        class="ma-auto"
-        rounded
-        @click="Login()"
-        >Вход</v-btn
-      >
+      <v-btn class="ma-auto" rounded @click="Login()">Вход</v-btn>
     </v-card>
     <v-snackbar v-model="snackbar" timeout="2000" top color="error">{{
       text
@@ -40,16 +35,15 @@
 </template>
 
 <script>
-import App from '../App';
+import App from "../App";
 export default {
-  name: 'LoginWindow',
+  name: "LoginWindow",
   methods: {
     Login() {
       App.$emit.log();
-    },
-  },
+    }
+  }
 };
-
 </script>
 
 <style scoped></style>

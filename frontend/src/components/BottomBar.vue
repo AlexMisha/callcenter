@@ -9,6 +9,6 @@
 
 <script>
 export default {
-  name: 'BottomBar',
+  name: "BottomBar"
 };
 </script>

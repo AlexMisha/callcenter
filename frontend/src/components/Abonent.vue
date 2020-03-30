@@ -178,95 +178,95 @@
 </template>
 
 <script>
-const axios = require('axios');
+const axios = require("axios");
 export default {
-  name: 'Abonent',
+  name: "Abonent",
   mounted() {
     axios
-        .get(
-            'http://localhost:8080/api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse',
+      .get(
+        "http://localhost:8080/api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse"
+      )
+      .then(response => (this.info = response.data._embedded))
+      .catch(
+        error => (
+          (this.snack = true),
+          (this.snackColor = "error"),
+          (this.snackText = "Ошибка подключения к серверу")
         )
-        .then((response) => (this.info = response.data._embedded))
-        .catch(
-            (error) => (
-              (this.snack = true),
-              (this.snackColor = 'error'),
-              (this.snackText = 'Ошибка подключения к серверу')
-            ),
-        );
+      );
     axios
-        .get('http://localhost:8080/clients/findNotCalledToday')
-        .then((response) => (this.infoToday = response))
-        .catch(
-            (error) => (
-              (this.snack = true),
-              (this.snackColor = 'error'),
-              (this.snackText = 'Ошибка подключения к серверу')
-            ),
-        );
+      .get("http://localhost:8080/clients/findNotCalledToday")
+      .then(response => (this.infoToday = response))
+      .catch(
+        error => (
+          (this.snack = true),
+          (this.snackColor = "error"),
+          (this.snackText = "Ошибка подключения к серверу")
+        )
+      );
     axios
-        .get('http://localhost:8080/clients/findNeverCalled')
-        .then((response) => (this.infoNever = response))
-        .catch(
-            (error) => (
-              (this.snack = true),
-              (this.snackColor = 'error'),
-              (this.snackText = 'Ошибка подключения к серверу')
-            ),
-        );
+      .get("http://localhost:8080/clients/findNeverCalled")
+      .then(response => (this.infoNever = response))
+      .catch(
+        error => (
+          (this.snack = true),
+          (this.snackColor = "error"),
+          (this.snackText = "Ошибка подключения к серверу")
+        )
+      );
   },
   methods: {
     save(item) {
       this.snack = true;
-      this.snackColor = 'success';
-      this.snackText = 'Данные сохранены';
+      this.snackColor = "success";
+      this.snackText = "Данные сохранены";
       axios
-          .patch(item._links.self.href, {
-            orderComment: item.orderComment,
-          })
-          .then(function(response) {
-            console.log(response);
-          })
-          .catch(
-              (error) => (
-                console.log(error),
-                (this.snack = true),
-                (this.snackColor = 'error'),
-                (this.snackText = 'Ошибка сохранения данных')
-              ),
-          );
+        .patch(item._links.self.href, {
+          orderComment: item.orderComment
+        })
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(
+          error => (
+            console.log(error),
+            (this.snack = true),
+            (this.snackColor = "error"),
+            (this.snackText = "Ошибка сохранения данных")
+          )
+        );
     },
     cancel() {
       this.snack = true;
-      this.snackColor = 'error';
-      this.snackText = 'Отмена';
+      this.snackColor = "error";
+      this.snackText = "Отмена";
     },
     open() {
       this.snack = true;
-      this.snackColor = 'info';
-      this.snackText = 'Окно открыто';
+      this.snackColor = "info";
+      this.snackText = "Окно открыто";
     },
     block(item) {
       axios
-          .patch(item._links.self.href, {
-            doNotCall: true,
-          })
-          .then(function(response) {
-            console.log(response);
-          })
-          .catch(
-              (error) => (
-                console.log(error),
-                (this.snack = true),
-                (this.snackColor = 'error'),
-                (this.snackText = 'Ошибка сохранения данных')
-              ),
-          );
+        .patch(item._links.self.href, {
+          doNotCall: true
+        })
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(
+          error => (
+            console.log(error),
+            (this.snack = true),
+            (this.snackColor = "error"),
+            (this.snackText = "Ошибка сохранения данных")
+          )
+        );
       this.snack = true;
-      this.snackColor = 'success';
-      this.snackText = 'Абонент больше не будет вызываться';
+      this.snackColor = "success";
+      this.snackText = "Абонент больше не будет вызываться";
     },
-    call() {},
+    call() {}
   },
   data() {
     return {
@@ -275,22 +275,22 @@ export default {
       infoToday: null,
       infoNever: null,
       snack: false,
-      snackColor: '',
-      snackText: '',
+      snackColor: "",
+      snackText: "",
       pagination: {},
       headers: [
         {
-          text: 'Фамилия',
-          align: 'left',
-          value: 'lastName',
+          text: "Фамилия",
+          align: "left",
+          value: "lastName"
         },
-        {text: 'Имя', value: 'firstName'},
-        {text: 'Отчество', value: 'middleName'},
-        {text: '', value: 'phone', sortable: false, width: 1},
-        {text: '', value: 'doNotCall', sortable: false, width: 1},
-        {text: 'Комментарий', value: 'orderComment'},
-      ],
+        { text: "Имя", value: "firstName" },
+        { text: "Отчество", value: "middleName" },
+        { text: "", value: "phone", sortable: false, width: 1 },
+        { text: "", value: "doNotCall", sortable: false, width: 1 },
+        { text: "Комментарий", value: "orderComment" }
+      ]
     };
-  },
+  }
 };
 </script>
