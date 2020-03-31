@@ -28,6 +28,9 @@ public class Operator {
     @Column(name = "login")
     private String login;
 
+    @Column(name = "phone")
+    private String phone;
+
     public Long getId() {
         return id;
     }
@@ -66,5 +69,13 @@ public class Operator {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
