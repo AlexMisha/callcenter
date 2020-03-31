@@ -1,28 +1,99 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-toolbar color="primary" max-height="75" dark flat>
+      <v-toolbar-title
+        ><v-icon>{{ "mdi-phone" }}</v-icon
+        >Call Center APP</v-toolbar-title
+      >
+    </v-toolbar>
+    <v-content v-if="!showData">
+      <v-card class="py-12 mx-auto" width="33%" flat>
+        <v-card-text
+          class="headline
+                            text-center"
+          v-text="'Вход в систему Call-центра'"
+        />
+        <v-spacer />
+        <v-text-field
+          v-model="login"
+          label="Логин"
+          hide-details="auto"
+          autofocus
+          outlined
+          clearable
+          rounded
+        />
+        <v-spacer class="ma-6"></v-spacer>
+        <v-text-field
+          v-model="password"
+          label="Пароль"
+          outlined
+          clearable
+          rounded
+          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="show ? 'text' : 'password'"
+          @click:append="show = !show"
+        />
+
+        <v-btn class="ma-auto" rounded @click="log()">Вход</v-btn>
+      </v-card>
+      <v-snackbar v-model="snackbar" top color="error">{{ text }}</v-snackbar>
+    </v-content>
+    <v-tabs v-else fixed-tabs>
+      <v-tab>
+        Вызвать
+      </v-tab>
+      <v-tab-item>
+        <Abonent/>
+      </v-tab-item>
+      <v-tab>
+        Звонки
+      </v-tab>
+      <v-tab-item>
+        <CDR/>
+      </v-tab-item>
+    </v-tabs>
+    <BottomBar />
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import BottomBar from './components/BottomBar';
+import CDR from './components/CDR';
+import Abonent from './components/Abonent';
+const axios = require('axios');
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
-}
-</script>
+    BottomBar,
+    Abonent,
+    CDR,
+  },
+  data: () => ({
+    login: '',
+    password: '',
+    showData: false,
+    snackbar: false,
+    status: '',
+    y: 'top',
+    text: 'Неверный логин или пароль',
+  }),
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+  methods: {
+    log() {
+      axios({
+        method: 'POST',
+        url: '/login',
+        headers: {'Content-Type': 'application/json', 'Accept': '*/*'},
+        data: {login: this.login, password: this.password},
+      }).then(
+          (response) => (
+            (localStorage.token = response.headers.authorization),
+            (this.status = response.status)
+          ),
+      );
+      if (this.status=='200') this.showData=true;
+    },
+  },
+};
+</script>
