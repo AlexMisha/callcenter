@@ -83,7 +83,7 @@ export default {
     log() {
       axios({
         method: 'POST',
-        url: 'http://localhost:8080/login',
+        url: '/login',
         headers: {'Content-Type': 'application/json', 'Accept': '*/*'},
         data: {login: this.login, password: this.password},
       }).then(
