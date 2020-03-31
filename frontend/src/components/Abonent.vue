@@ -201,7 +201,7 @@ export default {
         );
     axios({
       method: 'GET',
-      url: 'api/clients/search/findNoCalledToday',
+      url: 'clients/findNotCalledToday',
       headers: {
         'Content-Type': 'application/json',
         'Accept': '*/*',
@@ -218,7 +218,7 @@ export default {
         );
     axios({
       method: 'GET',
-      url: 'api/clients/search/findNeverCalled',
+      url: 'clients/findNeverCalled',
       headers: {
         'Content-Type': 'application/json',
         'Accept': '*/*',
