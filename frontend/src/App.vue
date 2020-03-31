@@ -6,7 +6,7 @@
         >Call Center APP</v-toolbar-title
       >
     </v-toolbar>
-    <v-content>
+    <v-content v-if="!showData">
       <v-card class="py-12 mx-auto" width="33%" flat>
         <v-card-text
           class="headline
@@ -39,26 +39,46 @@
       </v-card>
       <v-snackbar v-model="snackbar" top color="error">{{ text }}</v-snackbar>
     </v-content>
+    <v-tabs v-else fixed-tabs>
+      <v-tab>
+        Вызвать
+      </v-tab>
+      <v-tab-item>
+        <Abonent/>
+      </v-tab-item>
+      <v-tab>
+        Звонки
+      </v-tab>
+      <v-tab-item>
+        <CDR/>
+      </v-tab-item>
+    </v-tabs>
     <BottomBar />
   </v-app>
 </template>
 
 <script>
 import BottomBar from './components/BottomBar';
+import CDR from './components/CDR';
+import Abonent from './components/Abonent';
 const axios = require('axios');
 export default {
   name: 'App',
   components: {
     BottomBar,
+    Abonent,
+    CDR,
   },
   data: () => ({
     login: '',
     password: '',
-    showData: true,
+    showData: false,
     snackbar: false,
+    status: '',
     y: 'top',
     text: 'Неверный логин или пароль',
   }),
+
   methods: {
     log() {
       axios({
@@ -66,7 +86,13 @@ export default {
         url: 'http://localhost:8080/login',
         headers: {'Content-Type': 'application/json', 'Accept': '*/*'},
         data: {login: this.login, password: this.password},
-      }).then((response) => console.log(JSON.stringify(response)));
+      }).then(
+          (response) => (
+            (localStorage.token = response.headers.authorization),
+            (this.status = response.status)
+          ),
+      );
+      if (this.status=='200') this.showData=true;
     },
   },
 };

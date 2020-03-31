@@ -41,15 +41,19 @@ export default {
     };
   },
   mounted() {
-    axios
-        .get('http://localhost:8080/api/cdr')
-        .then(
-            (response) => (this.info = response.data._embedded),
-        );
+    axios({
+      method: 'GET',
+      url: 'api/cdr',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Authorization': localStorage.token,
+      },
+    }).then((response) => (this.info = response.data._embedded));
   },
   methods: {
     download(filename) {
-      window.open('http://localhost:8080/downloadCallRecord/'+filename);
+      window.open('downloadCallRecord/' + filename);
     },
   },
 };

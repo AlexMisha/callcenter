@@ -182,10 +182,15 @@ const axios = require('axios');
 export default {
   name: 'Abonent',
   mounted() {
-    axios
-        .get(
-            'http://localhost:8080/api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse',
-        )
+    axios({
+      method: 'GET',
+      url: 'api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Authorization': localStorage.token,
+      },
+    })
         .then((response) => (this.info = response.data._embedded))
         .catch(
             (error) => (
@@ -194,8 +199,15 @@ export default {
               (this.snackText = 'Ошибка подключения к серверу')
             ),
         );
-    axios
-        .get('http://localhost:8080/clients/findNotCalledToday')
+    axios({
+      method: 'GET',
+      url: 'api/clients/search/findNoCalledToday',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Authorization': localStorage.token,
+      },
+    })
         .then((response) => (this.infoToday = response))
         .catch(
             (error) => (
@@ -204,8 +216,15 @@ export default {
               (this.snackText = 'Ошибка подключения к серверу')
             ),
         );
-    axios
-        .get('http://localhost:8080/clients/findNeverCalled')
+    axios({
+      method: 'GET',
+      url: 'api/clients/search/findNeverCalled',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Authorization': localStorage.token,
+      },
+    })
         .then((response) => (this.infoNever = response))
         .catch(
             (error) => (
@@ -220,10 +239,16 @@ export default {
       this.snack = true;
       this.snackColor = 'success';
       this.snackText = 'Данные сохранены';
-      axios
-          .patch(item._links.self.href, {
-            orderComment: item.orderComment,
-          })
+      axios({
+        method: 'PATCH',
+        url: item._links.self.href,
+        data: {orderComment: item.orderComment},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': localStorage.token,
+        },
+      })
           .then(function(response) {
             console.log(response);
           })
@@ -247,10 +272,16 @@ export default {
       this.snackText = 'Окно открыто';
     },
     block(item) {
-      axios
-          .patch(item._links.self.href, {
-            doNotCall: true,
-          })
+      axios({
+        method: 'PATCH',
+        url: item._links.self.href,
+        data: {doNotCall: true},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': localStorage.token,
+        },
+      })
           .then(function(response) {
             console.log(response);
           })
