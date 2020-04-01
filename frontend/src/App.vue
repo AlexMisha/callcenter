@@ -92,7 +92,7 @@ export default {
             (this.status = response.status)
           ),
       );
-      if (this.status=='200') this.showData=true;
+      if (this.status==200) this.showData=true;
     },
   },
 };
