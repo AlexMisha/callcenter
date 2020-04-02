@@ -47,7 +47,7 @@ export default {
       headers: {
         'Content-Type': 'application/json',
         'Accept': '*/*',
-        'Authorization': localStorage.token,
+        'Authorization': sessionStorage.token,
       },
     }).then((response) => (this.info = response.data._embedded));
   },

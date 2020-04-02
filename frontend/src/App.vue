@@ -5,6 +5,8 @@
         ><v-icon>{{ "mdi-phone" }}</v-icon
         >Call Center APP</v-toolbar-title
       >
+      <v-spacer></v-spacer>
+      {{welcome}}
     </v-toolbar>
     <v-content v-if="!showData">
       <v-card class="py-12 mx-auto" width="33%" flat>
@@ -35,7 +37,12 @@
           @click:append="show = !show"
         />
 
-        <v-btn class="ma-auto" rounded @click="log()">Вход</v-btn>
+        <v-btn
+                class="ma-auto"
+                rounded
+                @click="log()">
+          Вход
+        </v-btn>
       </v-card>
       <v-snackbar v-model="snackbar" top color="error">{{ text }}</v-snackbar>
     </v-content>
@@ -70,6 +77,7 @@ export default {
     CDR,
   },
   data: () => ({
+    welcome: '',
     login: '',
     password: '',
     showData: false,
@@ -78,7 +86,11 @@ export default {
     y: 'top',
     text: 'Неверный логин или пароль',
   }),
-
+  mounted() {
+    sessionStorage.phone = '';
+    sessionStorage.token = '';
+    sessionStorage.login = '';
+  },
   methods: {
     log() {
       axios({
@@ -88,11 +100,28 @@ export default {
         data: {login: this.login, password: this.password},
       }).then(
           (response) => (
-            (localStorage.token = response.headers.authorization),
-            (this.status = response.status)
+            (sessionStorage.token = response.headers.authorization),
+            (this.status = response.status),
+            (axios({
+              method: 'GET',
+              url: '/api/operators/search/findByLogin?login=' + this.login,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': '*/*',
+                'Authorization': sessionStorage.token,
+              },
+            })
+                .then((response) =>
+                  ((sessionStorage.phone = response.data.phone),
+                  (this.showData=true),
+                  (this.welcome =
+                          'Добро пожаловать, ' + response.data.firstName),
+                  (sessionStorage.login = response.data.login)))
+            )
           ),
-      );
-      if (this.status==200) this.showData=true;
+          function error(response) {
+            this.snackbar = true;
+          });
     },
   },
 };

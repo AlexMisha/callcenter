@@ -9,8 +9,9 @@
           v-for="clients in info"
           :headers="headers"
         >
-          <template v-slot:item.phone="props">
+          <template v-slot:item.phone="props" >
             <v-btn
+                    v-on="on"
               @click="call()"
               rounded
               color="success"
@@ -20,6 +21,7 @@
               Звонок
             </v-btn>
           </template>
+
           <template v-slot:item.doNotCall="props">
             <v-btn
               @click="block(props.item)"
@@ -174,76 +176,27 @@
       {{ snackText }}
       <v-btn text @click="snack = false">Закрыть</v-btn>
     </v-snackbar>
-    <v-dialog>
-      <audio id="localAudio" autoPlay muted></audio>
-      <audio id="remoteAudio" autoPlay></audio>
-    </v-dialog>
+    <v-btn @click="terminatecall()">
+      Завершить
+    </v-btn>
+    <audio id="localAudio" autoPlay muted></audio>
+    <audio id="remoteAudio" autoPlay></audio>
+    <audio id="sounds" autoPlay></audio>
   </v-container>
 </template>
 
 <script>
-
-import * as JsSIP from 'jssip';
-
+  import * as JsSIP from 'jssip';
 const axios = require('axios');
 export default {
   name: 'Abonent',
+  showData: false,
   configuration: '',
   ua: '',
   mounted() {
-    axios({
-      method: 'GET',
-      url: 'api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Authorization': localStorage.token,
-      },
-    })
-        .then((response) => (this.info = response.data._embedded))
-        .catch(
-            (error) => (
-              (this.snack = true),
-              (this.snackColor = 'error'),
-              (this.snackText = 'Ошибка подключения к серверу')
-            ),
-        );
-    axios({
-      method: 'GET',
-      url: 'clients/findNotCalledToday',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Authorization': localStorage.token,
-      },
-    })
-        .then((response) => (this.infoToday = response))
-        .catch(
-            (error) => (
-              (this.snack = true),
-              (this.snackColor = 'error'),
-              (this.snackText = 'Ошибка подключения к серверу')
-            ),
-        );
-    axios({
-      method: 'GET',
-      url: 'clients/findNeverCalled',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Authorization': localStorage.token,
-      },
-    })
-        .then((response) => (this.infoNever = response))
-        .catch(
-            (error) => (
-              (this.snack = true),
-              (this.snackColor = 'error'),
-              (this.snackText = 'Ошибка подключения к серверу')
-            ),
-        );
+    this._soundsControl = document.getElementById('sounds');
     const socket = new JsSIP
-        .WebSocketInterface('ws://25.118.246.153/');
+        .WebSocketInterface('wss://25.118.246.153:8089/ws');
     socket.via_transport = 'udp';
     this.configuration = {
       sockets: [socket],
@@ -256,10 +209,64 @@ export default {
     this.ua.start();
 
     this.ua.on('registrationFailed', (data) => {
+      this.snack = true;
+      this.snackColor = 'error';
+      this.snackText = 'Ошибка голосового клиента';
       console.error('UA registrationFailed', data.cause);
     });
 
     this.ua.on('registered', () => {
+      axios({
+        method: 'GET',
+        url: 'api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) => (this.info = response.data._embedded))
+          .catch(
+              (error) => (
+                (this.snack = true),
+                (this.snackColor = 'error'),
+                (this.snackText = 'Ошибка подключения к серверу')
+              ),
+          );
+      axios({
+        method: 'GET',
+        url: 'clients/findNotCalledToday',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) => (this.infoToday = response))
+          .catch(
+              (error) => (
+                (this.snack = true),
+                (this.snackColor = 'error'),
+                (this.snackText = 'Ошибка подключения к серверу')
+              ),
+          );
+      axios({
+        method: 'GET',
+        url: 'clients/findNeverCalled',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) => (this.infoNever = response))
+          .catch(
+              (error) => (
+                (this.snack = true),
+                (this.snackColor = 'error'),
+                (this.snackText = 'Ошибка подключения к серверу')
+              ),
+          );
       console.log('UA registered');
     });
   },
@@ -275,7 +282,7 @@ export default {
         headers: {
           'Content-Type': 'application/json',
           'Accept': '*/*',
-          'Authorization': localStorage.token,
+          'Authorization': sessionStorage.token,
         },
       })
           .then(function(response) {
@@ -308,7 +315,7 @@ export default {
         headers: {
           'Content-Type': 'application/json',
           'Accept': '*/*',
-          'Authorization': localStorage.token,
+          'Authorization': sessionStorage.token,
         },
       })
           .then(function(response) {
@@ -331,6 +338,7 @@ export default {
       const eventHandlers = {
         'progress': function(e) {
           console.log('call is in progress');
+          // playSound('audio/ringbacktone.mp3', true);
         },
         'failed': function(e) {
           console.log('call failed with cause: '+ e.data.cause);
@@ -340,10 +348,36 @@ export default {
         },
         'confirmed': function(e) {
           console.log('call confirmed');
+          const peerconnection = sessionStorage.session.connection;
+          const localStream = peerconnection.getLocalStreams()[0];
+
+          // Handle local stream
+          if (localStream) {
+            // Clone local stream
+            this._localClonedStream = localStream.clone();
+
+            console.log('UA set local stream');
+
+            const localAudioControl = document.getElementById('localAudio');
+            localAudioControl.srcObject = this._localClonedStream;
+          }
+
+          peerconnection.addEventListener('addstream', (event) => {
+            console.log('UA session addstream');
+
+            const remoteAudioControl = document.getElementById('remoteAudio');
+            remoteAudioControl.srcObject = event.stream;
+          });
+          console.log('call confirmed');
         },
       };
 
       const options = {
+        'pcConfig':
+                {
+                  hackStripTcp: true,
+                  iceServers: [],
+                },
         'eventHandlers': eventHandlers,
         'mediaConstraints': {'audio': true, 'video': false},
         'rtcOfferConstraints':
@@ -353,38 +387,50 @@ export default {
                 },
       };
 
-      this.session = this.ua.call('102@25.118.246.153', options);
+      sessionStorage.session = this.ua.call('102@25.118.246.153', options);
 
-      this.session.on('progress', () => {
+      sessionStorage.session.on('progress', () => {
         console.log('UA session progress');
-        playSound('audio/ringbacktone.mp3', true);
+        // playSound('audio/ringbacktone.mp3', true);
       });
 
-      const peerconnection = this.session.connection;
-      const localStream = peerconnection.getLocalStreams()[0];
-
-      // Handle local stream
-      if (localStream) {
-        // Clone local stream
-        this._localClonedStream = localStream.clone();
-
-        console.log('UA set local stream');
-
-        const localAudioControl = document.getElementById('localAudio');
-        localAudioControl.srcObject = this._localClonedStream;
-      }
-
-      peerconnection.addEventListener('addstream', (event) => {
-        console.log('UA session addstream');
-
-        const remoteAudioControl = document.getElementById('remoteAudio');
-        remoteAudioControl.srcObject = event.stream;
+      sessionStorage.session.on('failed', (data) => {
+        console.log('UA session failed');
+        stopSound('audio/ringbacktone.mp3');
+        // playSound('audio/rejected.mp3', false);
       });
+
+
+      sessionStorage.session.on('connecting', () => {
+        console.log('UA session connecting');
+        // playSound('audio/ringbacktone.mp3', true);
+      });
+
+      sessionStorage.session.on('ended', () => {
+        console.log('UA session ended');
+        // playSound('audio/rejected.mp3', false);
+        JsSIP.Utils.closeMediaStream(this._localClonedStream);
+      });
+
+      // Звонок принят, моно начинать говорить
+      sessionStorage.session.on('accepted', () => {
+        console.log('UA session accepted');
+        // stopSound('audio/ringbacktone.mp3');
+        // playSound('audio/answered.mp3', false);
+      });
+
       console.log('click');
     },
+    terminatecall() {
+      this.ua.terminateSessions;
+      sessionStorage.session.terminate;
+      JsSIP.Utils.closeMediaStream(this._localClonedStream);
+    },
   },
+
   data() {
     return {
+      dialog: false,
       Client: [],
       info: null,
       infoToday: null,
@@ -408,4 +454,6 @@ export default {
     };
   },
 };
+
+
 </script>
