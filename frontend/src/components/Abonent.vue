@@ -181,12 +181,12 @@
     </v-btn>
     <audio id="localAudio" autoPlay muted></audio>
     <audio id="remoteAudio" autoPlay></audio>
-    <audio id="sounds" autoPlay></audio>
+
   </v-container>
 </template>
 
 <script>
-  import * as JsSIP from 'jssip';
+import * as JsSIP from 'jssip';
 const axios = require('axios');
 export default {
   name: 'Abonent',
@@ -194,7 +194,6 @@ export default {
   configuration: '',
   ua: '',
   mounted() {
-    this._soundsControl = document.getElementById('sounds');
     const socket = new JsSIP
         .WebSocketInterface('wss://25.118.246.153:8089/ws');
     socket.via_transport = 'udp';
@@ -396,7 +395,7 @@ export default {
 
       sessionStorage.session.on('failed', (data) => {
         console.log('UA session failed');
-        stopSound('audio/ringbacktone.mp3');
+        // stopSound('audio/ringbacktone.mp3');
         // playSound('audio/rejected.mp3', false);
       });
 
