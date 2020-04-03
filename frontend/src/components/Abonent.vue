@@ -195,14 +195,16 @@ export default {
   ua: '',
   mounted() {
     const socket = new JsSIP
-        .WebSocketInterface('ws://25.118.246.153:8088/ws');
+        .WebSocketInterface('wss://25.118.246.153:8089/ws');
+    socket.via_transport='wss';
+    // socket.sip_uri='sip:101@25.118.246.153';
     socket.connect();
+    console.log(socket.sip_uri);
     this.configuration = {
       sockets: [socket],
       uri: 'sip:101@25.118.246.153',
       password: '123',
       realm: 'asterisk.org',
-      authorization_user: 101,
     };
 
     this.ua = new JsSIP.UA(this.configuration);
@@ -335,51 +337,12 @@ export default {
       this.snackText = 'Абонент больше не будет вызываться';
     },
     call() {
-      // Register callbacks to desired call events
-      const eventHandlers = {
-        'progress': function(e) {
-          console.log('call is in progress');
-          // playSound('audio/ringbacktone.mp3', true);
-        },
-        'failed': function(e) {
-          console.log('call failed with cause: '+ e.data.cause);
-        },
-        'ended': function(e) {
-          console.log('call ended with cause: '+ e.data.cause);
-        },
-        'confirmed': function(e) {
-          console.log('call confirmed');
-          const peerconnection = sessionStorage.session.connection;
-          const localStream = peerconnection.getLocalStreams()[0];
-
-          // Handle local stream
-          if (localStream) {
-            // Clone local stream
-            this._localClonedStream = localStream.clone();
-
-            console.log('UA set local stream');
-
-            const localAudioControl = document.getElementById('localAudio');
-            localAudioControl.srcObject = this._localClonedStream;
-          }
-
-          peerconnection.addEventListener('addstream', (event) => {
-            console.log('UA session addstream');
-
-            const remoteAudioControl = document.getElementById('remoteAudio');
-            remoteAudioControl.srcObject = event.stream;
-          });
-          console.log('call confirmed');
-        },
-      };
-
       const options = {
         'pcConfig':
                 {
                   hackStripTcp: true,
                   iceServers: [],
                 },
-        'eventHandlers': eventHandlers,
         'mediaConstraints': {'audio': true, 'video': false},
         'rtcOfferConstraints':
                 {
@@ -388,38 +351,62 @@ export default {
                 },
       };
 
-      sessionStorage.session = this.ua.call('102@25.118.246.153', options);
+      this.session = this.ua.call('102@25.118.246.153', options);
 
-      sessionStorage.session.on('progress', () => {
+      this.session.on('progress', () => {
         console.log('UA session progress');
         // playSound('audio/ringbacktone.mp3', true);
       });
 
-      sessionStorage.session.on('failed', (data) => {
+      this.session.on('failed', (data) => {
         console.log('UA session failed');
         // stopSound('audio/ringbacktone.mp3');
         // playSound('audio/rejected.mp3', false);
       });
 
 
-      sessionStorage.session.on('connecting', () => {
+      this.session.on('connecting', () => {
         console.log('UA session connecting');
         // playSound('audio/ringbacktone.mp3', true);
       });
 
-      sessionStorage.session.on('ended', () => {
+      this.session.on('ended', () => {
         console.log('UA session ended');
         // playSound('audio/rejected.mp3', false);
         JsSIP.Utils.closeMediaStream(this._localClonedStream);
       });
 
       // Звонок принят, моно начинать говорить
-      sessionStorage.session.on('accepted', () => {
+      this.session.on('confirmed', () => {
         console.log('UA session accepted');
+
+
+        const peerconnection = this.session.connection;
+        console.log(peerconnection);
+        const localStream = peerconnection.getLocalStreams()[0];
+        console.log(localStream);
+        // Handle local stream
+        if (localStream) {
+          // Clone local stream
+          this._localClonedStream = localStream.clone();
+
+          console.log('UA set local stream');
+
+          const localAudioControl = document.getElementById('localAudio');
+          localAudioControl.srcObject = this._localClonedStream;
+        }
+
+        peerconnection.addEventListener('addstream', (event) => {
+          console.log('UA session addstream');
+
+          const remoteAudioControl = document.getElementById('remoteAudio');
+          remoteAudioControl.srcObject = event.stream;
+        });
+
+
         // stopSound('audio/ringbacktone.mp3');
         // playSound('audio/answered.mp3', false);
       });
-
       console.log('click');
     },
     terminatecall() {
