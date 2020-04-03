@@ -195,12 +195,14 @@ export default {
   ua: '',
   mounted() {
     const socket = new JsSIP
-        .WebSocketInterface('wss://25.118.246.153:8089/ws');
-    socket.via_transport = 'udp';
+        .WebSocketInterface('ws://25.118.246.153:8088/ws');
+    socket.connect();
     this.configuration = {
       sockets: [socket],
       uri: 'sip:101@25.118.246.153',
       password: '123',
+      realm: 'asterisk.org',
+      authorization_user: 101,
     };
 
     this.ua = new JsSIP.UA(this.configuration);
@@ -421,8 +423,7 @@ export default {
       console.log('click');
     },
     terminatecall() {
-      this.ua.terminateSessions;
-      sessionStorage.session.terminate;
+      this.ua.terminateSessions();
       JsSIP.Utils.closeMediaStream(this._localClonedStream);
     },
   },
