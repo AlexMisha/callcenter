@@ -23,6 +23,9 @@
 				<constraints nullable="false" />
 			</column>
 			<column name="middle_name" type="varchar()" />
+			<column name="phone" type="varchar()">
+				<constraints nullable="false" />
+			</column>
 		</createTable>
 		<rollback>
 			<dropTable tableName="operator" cascadeConstraints="true" />
