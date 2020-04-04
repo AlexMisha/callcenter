@@ -1,6 +1,17 @@
 <template>
+  <v-app>
   <v-container>
-    <v-tabs fixed-tabs>
+    <v-dialog v-model="dialog" persistent max-width="290">
+      <v-card>
+        <v-progress-circular
+                :size="50"
+                color="primary"
+                indeterminate
+                style="margin: 1rem;"
+        ></v-progress-circular>Подключение к серверу
+      </v-card>
+    </v-dialog>
+    <v-tabs fixed-tabs v-if="dialog==false">
       <v-tab>Клиенты</v-tab>
       <v-tab-item>
         <v-data-table
@@ -9,17 +20,37 @@
           v-for="clients in info"
           :headers="headers"
         >
-          <template v-slot:item.phone="props" >
-            <v-btn
-                    v-on="on"
-              @click="call()"
-              rounded
-              color="success"
-              :return-value.sync="props.item.phone"
-            >
-              <v-icon>{{ "mdi-phone" }}</v-icon>
-              Звонок
-            </v-btn>
+          <template v-slot:item.phone="props">
+            <v-dialog v-model="dialog" persistent max-width="290">
+              <template  v-slot:activator="{ on }">
+                <v-btn
+                        @click="call(props.item)"
+                        rounded
+                        color="success"
+                        v-on="on"
+                        :return-value.sync="props.item.phone"
+                >
+                  <v-icon>{{ "mdi-phone" }}</v-icon>
+                  Звонок
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title class="headline">
+                  Идет звонок
+                </v-card-title>
+                <v-card-text>
+                  Вызываемый абонент: {{abonent}}
+                  <br>
+                  {{callTime}}
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn @click="terminatecall()">
+                    Завершить
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </template>
 
           <template v-slot:item.doNotCall="props">
@@ -68,15 +99,36 @@
           :headers="headers"
         >
           <template v-slot:item.phone="props">
-            <v-btn
-              @click="call()"
-              rounded
-              color="success"
-              :return-value.sync="props.item.phone"
-            >
-              <v-icon>{{ "mdi-phone" }}</v-icon>
-              Звонок
-            </v-btn>
+            <v-dialog v-model="dialog" persistent max-width="290">
+              <template  v-slot:activator="{ on }">
+                <v-btn
+                        @click="call(props.item)"
+                        rounded
+                        color="success"
+                        v-on="on"
+                        :return-value.sync="props.item.phone"
+                >
+                  <v-icon>{{ "mdi-phone" }}</v-icon>
+                  Звонок
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title class="headline">
+                  Идет звонок
+                </v-card-title>
+                <v-card-text>
+                  Вызываемый абонент: {{abonent}}
+                  <br>
+                  {{callTime}}
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn @click="terminatecall()">
+                    Завершить
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </template>
           <template v-slot:item.doNotCall="props">
             <v-btn
@@ -123,17 +175,40 @@
           v-for="clients in infoNever"
           :headers="headers"
         >
+
           <template v-slot:item.phone="props">
+            <v-dialog v-model="dialog" persistent max-width="290">
+            <template  v-slot:activator="{ on }">
             <v-btn
-              @click="call()"
+              @click="call(props.item)"
               rounded
               color="success"
+              v-on="on"
               :return-value.sync="props.item.phone"
             >
               <v-icon>{{ "mdi-phone" }}</v-icon>
               Звонок
             </v-btn>
+            </template>
+            <v-card>
+              <v-card-title class="headline">
+                Идет звонок
+              </v-card-title>
+              <v-card-text>
+                Вызываемый абонент: {{abonent}}
+                <br>
+                {{callTime}}
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="terminatecall()">
+                  Завершить
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+            </v-dialog>
           </template>
+
           <template v-slot:item.doNotCall="props">
             <v-btn
               @click="block(props.item)"
@@ -176,13 +251,11 @@
       {{ snackText }}
       <v-btn text @click="snack = false">Закрыть</v-btn>
     </v-snackbar>
-    <v-btn @click="terminatecall()">
-      Завершить
-    </v-btn>
     <audio id="localAudio" autoPlay muted></audio>
     <audio id="remoteAudio" autoPlay></audio>
 
   </v-container>
+  </v-app>
 </template>
 
 <script>
@@ -192,17 +265,19 @@ export default {
   name: 'Abonent',
   showData: false,
   configuration: '',
+  abonent: '',
+  callTime: '',
+  timerId: '',
   ua: '',
   mounted() {
     const socket = new JsSIP
         .WebSocketInterface('wss://25.118.246.153:8089/ws');
     socket.via_transport='wss';
-    // socket.sip_uri='sip:101@25.118.246.153';
     socket.connect();
     console.log(socket.sip_uri);
     this.configuration = {
       sockets: [socket],
-      uri: 'sip:101@25.118.246.153',
+      uri: 'sip:' + sessionStorage.phone + '@25.118.246.153',
       password: '123',
       realm: 'asterisk.org',
     };
@@ -214,7 +289,7 @@ export default {
     this.ua.on('registrationFailed', (data) => {
       this.snack = true;
       this.snackColor = 'error';
-      this.snackText = 'Ошибка голосового клиента';
+      this.snackText = 'Ошибка регистрации';
       console.error('UA registrationFailed', data.cause);
     });
 
@@ -271,6 +346,7 @@ export default {
               ),
           );
       console.log('UA registered');
+      this.dialog=false;
     });
   },
   methods: {
@@ -280,7 +356,7 @@ export default {
       this.snackText = 'Данные сохранены';
       axios({
         method: 'PATCH',
-        url: item._links.self.href,
+        url: '/api/clients/'+item.id,
         data: {orderComment: item.orderComment},
         headers: {
           'Content-Type': 'application/json',
@@ -313,7 +389,7 @@ export default {
     block(item) {
       axios({
         method: 'PATCH',
-        url: item._links.self.href,
+        url: '/api/clients/'+item.id,
         data: {doNotCall: true},
         headers: {
           'Content-Type': 'application/json',
@@ -336,7 +412,10 @@ export default {
       this.snackColor = 'success';
       this.snackText = 'Абонент больше не будет вызываться';
     },
-    call() {
+    call(item) {
+      this.abonent = item.lastName +
+              ' ' + item.firstName +
+              ' ' + item.middleName;
       const options = {
         'pcConfig':
                 {
@@ -351,35 +430,33 @@ export default {
                 },
       };
 
-      this.session = this.ua.call('102@25.118.246.153', options);
+      this.session = this.ua.call(item.phone + '@25.118.246.153', options);
 
       this.session.on('progress', () => {
+        this.callTime = 'Соединяем...';
         console.log('UA session progress');
-        // playSound('audio/ringbacktone.mp3', true);
       });
 
       this.session.on('failed', (data) => {
         console.log('UA session failed');
-        // stopSound('audio/ringbacktone.mp3');
-        // playSound('audio/rejected.mp3', false);
+        this.callTime = 'Звонок не удался';
       });
 
 
       this.session.on('connecting', () => {
         console.log('UA session connecting');
-        // playSound('audio/ringbacktone.mp3', true);
       });
 
       this.session.on('ended', () => {
         console.log('UA session ended');
-        // playSound('audio/rejected.mp3', false);
+        clearInterval(this.timerId);
+        this.callTime = 'Звонок завершен';
         JsSIP.Utils.closeMediaStream(this._localClonedStream);
       });
 
       // Звонок принят, моно начинать говорить
       this.session.on('confirmed', () => {
         console.log('UA session accepted');
-
 
         const peerconnection = this.session.connection;
         console.log(peerconnection);
@@ -402,14 +479,18 @@ export default {
           const remoteAudioControl = document.getElementById('remoteAudio');
           remoteAudioControl.srcObject = event.stream;
         });
-
-
-        // stopSound('audio/ringbacktone.mp3');
-        // playSound('audio/answered.mp3', false);
       });
-      console.log('click');
+      const d = new Date();
+      const n = d.toLocaleTimeString();
+      this.timerId = setInterval(
+          this.callTime=
+                      'Время звонка: ' +
+                  (n-this.session.start_time),
+          1000);
+      console.log(n);
     },
     terminatecall() {
+      this.dialog = false;
       this.ua.terminateSessions();
       JsSIP.Utils.closeMediaStream(this._localClonedStream);
     },
@@ -417,7 +498,7 @@ export default {
 
   data() {
     return {
-      dialog: false,
+      dialog: true,
       Client: [],
       info: null,
       infoToday: null,
