@@ -180,6 +180,8 @@ export default {
       );
     },
     unlog() {
+      this.login='';
+      this.password='';
       this.showData = false;
       this.welcome = '';
       sessionStorage.token = '';

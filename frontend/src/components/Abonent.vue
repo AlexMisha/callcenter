@@ -261,8 +261,7 @@
       <v-btn text @click="snack = false">Закрыть</v-btn>
     </v-snackbar>
   </v-container>
-      <audio id="localAudio" autoPlay muted></audio>
-      <audio id="remoteAudio" autoPlay></audio>
+      <audio id="remoteAudio"></audio>
   </v-app>
 </template>
 
@@ -420,6 +419,7 @@ export default {
       this.snackText = 'Абонент больше не будет вызываться';
     },
     call(item) {
+      if (item.middleName==null) item.middleName = '';
       this.abonent = item.lastName +
               ' ' + item.firstName +
               ' ' + item.middleName;
@@ -436,10 +436,33 @@ export default {
                   'offerToReceiveVideo': 0,
                 },
       };
-
+      console.log('beforecall');
       this.session = this.ua.call(item.phone + '@25.118.246.153', options);
-
-      this.session.on('progress', () => {
+      console.log('aftercall');
+      this.ua.on('newRTCSession', function(data) {
+        const session = data.session; // outgoing call session here
+        session.on('confirmed', function() {
+          // the call has connected, and audio is playing
+          console.log('UA session accepted');
+        });
+        session.on('ended', function() {
+          // the call has ended
+          console.log('UA session ended');
+        });
+        session.on('failed', function() {
+          // unable to establish the call
+          console.log('UA session failed');
+        });
+        session.on('addstream', function(e) {
+          // set remote audio stream (to listen to remote audio)
+          // remoteAudio is <audio> element on page
+          console.log('UA session addstream');
+          const remoteAudio = document.getElementById('remoteAudio');
+          remoteAudio.src = window.URL.createObjectURL(e.stream);
+          remoteAudio.play();
+        });
+      });
+      /* this.session.on('progress', () => {
         this.callTime = 'Соединяем...';
         console.log('UA session progress');
       });
@@ -455,19 +478,6 @@ export default {
 
         const peerconnection = this.session.connection;
         console.log(peerconnection);
-        const localStream = peerconnection.getLocalStreams()[0];
-        console.log(localStream);
-        // Handle local stream
-        if (localStream) {
-          // Clone local stream
-          this._localClonedStream = localStream.clone();
-
-          console.log('UA set local stream');
-
-          const localAudioControl = document.getElementById('localAudio');
-          localAudioControl.srcObject = this._localClonedStream;
-        }
-
         peerconnection.addEventListener('addstream', (event) => {
           console.log('UA session addstream');
 
@@ -479,18 +489,16 @@ export default {
       this.session.on('ended', () => {
         console.log('UA session ended');
         this.callTime = 'Звонок завершен';
-        JsSIP.Utils.closeMediaStream(this._localClonedStream);
       });
 
       // Звонок принят, моно начинать говорить
       this.session.on('confirmed', () => {
         console.log('UA session accepted');
-      });
+      }); */
     },
     terminatecall() {
       this.dialogCall = false;
       this.ua.terminateSessions();
-      JsSIP.Utils.closeMediaStream(this._localClonedStream);
     },
   },
 
