@@ -21,7 +21,7 @@
           :headers="headers"
         >
           <template v-slot:item.phone="props">
-            <v-dialog v-model="dialog" persistent max-width="290">
+            <v-dialog v-model="dialogCall" persistent max-width="290">
               <template  v-slot:activator="{ on }">
                 <v-btn
                         @click="call(props.item)"
@@ -45,7 +45,10 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn @click="terminatecall()">
+                  <v-btn
+                          rounded
+                          color="error"
+                          @click="terminatecall()">
                     Завершить
                   </v-btn>
                 </v-card-actions>
@@ -99,7 +102,7 @@
           :headers="headers"
         >
           <template v-slot:item.phone="props">
-            <v-dialog v-model="dialog" persistent max-width="290">
+            <v-dialog v-model="dialogCall" persistent max-width="290">
               <template  v-slot:activator="{ on }">
                 <v-btn
                         @click="call(props.item)"
@@ -123,7 +126,10 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn @click="terminatecall()">
+                  <v-btn
+                          rounded
+                          color="error"
+                          @click="terminatecall()">
                     Завершить
                   </v-btn>
                 </v-card-actions>
@@ -177,7 +183,7 @@
         >
 
           <template v-slot:item.phone="props">
-            <v-dialog v-model="dialog" persistent max-width="290">
+            <v-dialog v-model="dialogCall" persistent max-width="290">
             <template  v-slot:activator="{ on }">
             <v-btn
               @click="call(props.item)"
@@ -201,7 +207,10 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn @click="terminatecall()">
+                <v-btn
+                        rounded
+                        color="error"
+                        @click="terminatecall()">
                   Завершить
                 </v-btn>
               </v-card-actions>
@@ -251,10 +260,9 @@
       {{ snackText }}
       <v-btn text @click="snack = false">Закрыть</v-btn>
     </v-snackbar>
-    <audio id="localAudio" autoPlay muted></audio>
-    <audio id="remoteAudio" autoPlay></audio>
-
   </v-container>
+      <audio id="localAudio" autoPlay muted></audio>
+      <audio id="remoteAudio" autoPlay></audio>
   </v-app>
 </template>
 
@@ -267,7 +275,6 @@ export default {
   configuration: '',
   abonent: '',
   callTime: '',
-  timerId: '',
   ua: '',
   mounted() {
     const socket = new JsSIP
@@ -445,18 +452,6 @@ export default {
 
       this.session.on('connecting', () => {
         console.log('UA session connecting');
-      });
-
-      this.session.on('ended', () => {
-        console.log('UA session ended');
-        clearInterval(this.timerId);
-        this.callTime = 'Звонок завершен';
-        JsSIP.Utils.closeMediaStream(this._localClonedStream);
-      });
-
-      // Звонок принят, моно начинать говорить
-      this.session.on('confirmed', () => {
-        console.log('UA session accepted');
 
         const peerconnection = this.session.connection;
         console.log(peerconnection);
@@ -480,17 +475,20 @@ export default {
           remoteAudioControl.srcObject = event.stream;
         });
       });
-      const d = new Date();
-      const n = d.toLocaleTimeString();
-      this.timerId = setInterval(
-          this.callTime=
-                      'Время звонка: ' +
-                  (n-this.session.start_time),
-          1000);
-      console.log(n);
+
+      this.session.on('ended', () => {
+        console.log('UA session ended');
+        this.callTime = 'Звонок завершен';
+        JsSIP.Utils.closeMediaStream(this._localClonedStream);
+      });
+
+      // Звонок принят, моно начинать говорить
+      this.session.on('confirmed', () => {
+        console.log('UA session accepted');
+      });
     },
     terminatecall() {
-      this.dialog = false;
+      this.dialogCall = false;
       this.ua.terminateSessions();
       JsSIP.Utils.closeMediaStream(this._localClonedStream);
     },
@@ -499,6 +497,7 @@ export default {
   data() {
     return {
       dialog: true,
+      dialogCall: false,
       Client: [],
       info: null,
       infoToday: null,

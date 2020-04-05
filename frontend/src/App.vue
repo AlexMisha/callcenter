@@ -7,6 +7,13 @@
       >
       <v-spacer></v-spacer>
       {{welcome}}
+      <v-btn
+              v-if="showData"
+              rounded
+              dark
+      @click="unlog()">
+        Выход
+      </v-btn>
     </v-toolbar>
     <v-content v-if="!showData">
       <v-card class="py-12 mx-auto" width="33%" flat>
@@ -107,9 +114,35 @@ export default {
   },
 
   mounted() {
-    sessionStorage.phone = '';
-    sessionStorage.token = '';
-    sessionStorage.login = '';
+    if ((sessionStorage.token)&&(sessionStorage.login)) {
+      this.dialog=true;
+      axios({
+        method: 'GET',
+        url: '/api/operators/search/findByLogin?login=' + sessionStorage.login,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) =>
+            ((sessionStorage.phone = response.data.phone),
+            (this.dialog = false),
+            (this.showData = true),
+            (this.welcome =
+            'Добро пожаловать, ' + response.data.firstName),
+            (sessionStorage.login = response.data.login)
+            ))
+          .catch(
+              () => (
+                (this.snackbar = true),
+                (this.dialog = false),
+                (this.text = 'Ошибка авторизации. Пожалуйста повторите попытку')
+              ),
+          );
+    } else {
+      this.dialog = false;
+    }
   },
   methods: {
     log() {
@@ -145,6 +178,13 @@ export default {
             (this.dialog = false)
           ),
       );
+    },
+    unlog() {
+      this.showData = false;
+      this.welcome = '';
+      sessionStorage.token = '';
+      sessionStorage.phone = '';
+      sessionStorage.login = '';
     },
   },
 };
