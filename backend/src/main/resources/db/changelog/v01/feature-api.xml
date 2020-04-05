@@ -2,13 +2,14 @@
 <databaseChangeLog
 		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
-		logicalFilePath="feature-api.xml">
-	<changeSet id="feature-api.xml" author="Alex Misha" context="develop">
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
+		logicalFilePath="feature-api.xml"
+		context="prod">
+	<changeSet id="feature-api.xml" author="Alex Misha">
 		<tagDatabase tag="feature-api.xml" />
 	</changeSet>
 
-	<changeSet id="ct.operator" author="Alex Misha" context="develop">
+	<changeSet id="ct.operator" author="Alex Misha">
 		<createTable tableName="operator">
 			<column name="id" type="bigint">
 				<constraints primaryKey="true" nullable="false" />
@@ -31,14 +32,14 @@
 			<dropTable tableName="operator" cascadeConstraints="true" />
 		</rollback>
 	</changeSet>
-	<changeSet id="cs.operator" author="Alex Misha" context="develop">
+	<changeSet id="cs.operator" author="Alex Misha">
 		<createSequence sequenceName="sq_operator" startValue="1" incrementBy="1" />
 		<rollback>
 			<dropSequence sequenceName="sq_operator" />
 		</rollback>
 	</changeSet>
 
-	<changeSet id="ct.operator_password" author="Alex Misha" context="develop">
+	<changeSet id="ct.operator_password" author="Alex Misha">
 		<createTable tableName="operator_password">
 			<column name="id" type="bigint">
 				<constraints primaryKey="true" nullable="false" />
@@ -54,14 +55,14 @@
 			<dropTable tableName="operator_password" cascadeConstraints="true" />
 		</rollback>
 	</changeSet>
-	<changeSet id="cs.operator_password" author="Alex Misha" context="develop">
+	<changeSet id="cs.operator_password" author="Alex Misha">
 		<createSequence sequenceName="sq_operator_password" startValue="1" incrementBy="1" />
 		<rollback>
 			<dropSequence sequenceName="sq_operator_password" />
 		</rollback>
 	</changeSet>
 
-	<changeSet id="ct.client" author="Alex Misha" context="develop">
+	<changeSet id="ct.client" author="Alex Misha">
 		<createTable tableName="client">
 			<column name="id" type="bigint">
 				<constraints primaryKey="true" nullable="false" />
@@ -83,7 +84,7 @@
 			<dropTable tableName="client" cascadeConstraints="true" />
 		</rollback>
 	</changeSet>
-	<changeSet id="cs.client" author="Alex Misha" context="develop">
+	<changeSet id="cs.client" author="Alex Misha">
 		<createSequence sequenceName="sq_client" startValue="1" incrementBy="1" />
 		<rollback>
 			<dropSequence sequenceName="sq_client" />
