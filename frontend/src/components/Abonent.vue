@@ -21,8 +21,6 @@
           :headers="headers"
         >
           <template v-slot:item.phone="props">
-            <v-dialog v-model="dialogCall" persistent max-width="290">
-              <template  v-slot:activator="{ on }">
                 <v-btn
                         @click="call(props.item)"
                         rounded
@@ -34,28 +32,6 @@
                   Звонок
                 </v-btn>
               </template>
-              <v-card>
-                <v-card-title class="headline">
-                  Идет звонок
-                </v-card-title>
-                <v-card-text>
-                  Вызываемый абонент: {{abonent}}
-                  <br>
-                  {{callTime}}
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                          rounded
-                          color="error"
-                          @click="terminatecall()">
-                    Завершить
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </template>
-
           <template v-slot:item.doNotCall="props">
             <v-btn
               @click="block(props.item)"
@@ -105,7 +81,7 @@
             <v-dialog v-model="dialogCall" persistent max-width="290">
               <template  v-slot:activator="{ on }">
                 <v-btn
-                        @click="call(props.item)"
+                        v-on:click="call(props.item)"
                         rounded
                         color="success"
                         v-on="on"
@@ -261,7 +237,28 @@
       <v-btn text @click="snack = false">Закрыть</v-btn>
     </v-snackbar>
   </v-container>
-      <audio id="remoteAudio"></audio>
+    <v-dialog v-model="dialogCall" persistent max-width="400">
+      <v-card>
+        <v-card-title class="headline">
+          Идет звонок
+        </v-card-title>
+        <v-card-text>
+          Вызываемый абонент: {{abonent}}
+          <br>
+          {{callTime}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+                  rounded
+                  color="error"
+                  @click="terminatecall()">
+            Завершить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+      <audio id="remoteAudio" autoPlay></audio>
   </v-app>
 </template>
 
@@ -273,7 +270,6 @@ export default {
   showData: false,
   configuration: '',
   abonent: '',
-  callTime: '',
   ua: '',
   mounted() {
     const socket = new JsSIP
@@ -419,6 +415,8 @@ export default {
       this.snackText = 'Абонент больше не будет вызываться';
     },
     call(item) {
+      this.callTime='';
+      this.dialogCall = true;
       if (item.middleName==null) item.middleName = '';
       this.abonent = item.lastName +
               ' ' + item.firstName +
@@ -439,43 +437,21 @@ export default {
       console.log('beforecall');
       this.session = this.ua.call(item.phone + '@25.118.246.153', options);
       console.log('aftercall');
-      this.ua.on('newRTCSession', function(data) {
-        const session = data.session; // outgoing call session here
-        session.on('confirmed', function() {
-          // the call has connected, and audio is playing
-          console.log('UA session accepted');
-        });
-        session.on('ended', function() {
-          // the call has ended
-          console.log('UA session ended');
-        });
-        session.on('failed', function() {
-          // unable to establish the call
-          console.log('UA session failed');
-        });
-        session.on('addstream', function(e) {
-          // set remote audio stream (to listen to remote audio)
-          // remoteAudio is <audio> element on page
-          console.log('UA session addstream');
-          const remoteAudio = document.getElementById('remoteAudio');
-          remoteAudio.src = window.URL.createObjectURL(e.stream);
-          remoteAudio.play();
-        });
-      });
-      /* this.session.on('progress', () => {
-        this.callTime = 'Соединяем...';
+
+      this.session.on('progress', () => {
         console.log('UA session progress');
+        this.callTime='Подключаемся...';
       });
 
       this.session.on('failed', (data) => {
-        console.log('UA session failed');
-        this.callTime = 'Звонок не удался';
+        console.log('UA session failed with: ' + data.cause);
+        this.callTime='Звонок не удался. Причина: ' + data.cause;
       });
 
 
       this.session.on('connecting', () => {
         console.log('UA session connecting');
-
+        this.callTime='Соединяемся...';
         const peerconnection = this.session.connection;
         console.log(peerconnection);
         peerconnection.addEventListener('addstream', (event) => {
@@ -488,13 +464,14 @@ export default {
 
       this.session.on('ended', () => {
         console.log('UA session ended');
-        this.callTime = 'Звонок завершен';
+        this.callTime='Звонок окончен.';
       });
 
       // Звонок принят, моно начинать говорить
       this.session.on('confirmed', () => {
         console.log('UA session accepted');
-      }); */
+        this.callTime='Звонок принят. Можно говорить.';
+      });
     },
     terminatecall() {
       this.dialogCall = false;
@@ -506,6 +483,7 @@ export default {
     return {
       dialog: true,
       dialogCall: false,
+      callTime: '',
       Client: [],
       info: null,
       infoToday: null,
