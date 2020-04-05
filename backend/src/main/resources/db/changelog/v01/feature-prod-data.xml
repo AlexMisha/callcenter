@@ -2,13 +2,14 @@
 <databaseChangeLog
 		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
-		logicalFilePath="feature-prod-data.xml">
-	<changeSet id="feature-prod-data.xml" author="Alex Misha" context="develop">
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
+		logicalFilePath="feature-prod-data.xml"
+		context="prod">
+	<changeSet id="feature-prod-data.xml" author="Alex Misha">
 		<tagDatabase tag="feature-prod-data.xml" />
 	</changeSet>
 
-	<changeSet id="insert.prod.data" author="Alex Misha" context="develop">
+	<changeSet id="insert.prod.data" author="Alex Misha">
 		<sql>
 			insert into operator (id, login, first_name, last_name, phone)
 			values (nextval('sq_operator'), 'misha', 'Михаил', 'Алексеев', '100');

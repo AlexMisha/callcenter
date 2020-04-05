@@ -10,11 +10,11 @@
 
 	<changeSet id="create-feature-api-test-data" author="Alex Misha" context="test">
 		<sql>
-			insert into operator (id, login, first_name, last_name, middle_name)
-			values (nextval('sq_operator'), 'user1', 'Иванов', 'Иван', 'Иваныч');
+			insert into operator (id, login, first_name, last_name, middle_name, phone)
+			values (nextval('sq_operator'), 'user1', 'Иванов', 'Иван', 'Иваныч', '00001010');
 
-			insert into operator (id, login, first_name, last_name)
-			values (nextval('sq_operator'), 'user2', 'Фред', 'Люпински');
+			insert into operator (id, login, first_name, last_name, phone)
+			values (nextval('sq_operator'), 'user2', 'Фред', 'Люпински', '223455');
 
 			insert into operator_password(id, password, operator_id)
 			values (nextval('sq_operator_password'), 'hashsum', (currval('sq_operator') - 1));
