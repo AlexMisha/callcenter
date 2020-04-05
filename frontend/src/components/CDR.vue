@@ -59,7 +59,7 @@ export default {
         headers: {
           'Content-Type': 'application/json',
           'Accept': '*/*',
-          'Authorization': localStorage.token,
+          'Authorization': sessionStorage.token,
         },
         responseType: 'blob',
       }).then((response) => {
