@@ -61,7 +61,6 @@
                   v-model="props.item.orderComment"
                   label="Редактировать"
                   single-line
-                  counter
                   autofocus
                 ></v-text-field>
               </template>
@@ -72,52 +71,29 @@
       <v-tab>Клиенты, которым сегодня не звонили</v-tab>
       <v-tab-item>
         <v-data-table
-          v-bind:key="clients"
-          :items="clients"
-          v-for="clients in infoToday"
-          :headers="headers"
+                v-bind:key="clients"
+                :items="clients"
+                v-for="clients in infoToday"
+                :headers="headers"
         >
           <template v-slot:item.phone="props">
-            <v-dialog v-model="dialogCall" persistent max-width="290">
-              <template  v-slot:activator="{ on }">
-                <v-btn
-                        v-on:click="call(props.item)"
-                        rounded
-                        color="success"
-                        v-on="on"
-                        :return-value.sync="props.item.phone"
-                >
-                  <v-icon>{{ "mdi-phone" }}</v-icon>
-                  Звонок
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title class="headline">
-                  Идет звонок
-                </v-card-title>
-                <v-card-text>
-                  Вызываемый абонент: {{abonent}}
-                  <br>
-                  {{callTime}}
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                          rounded
-                          color="error"
-                          @click="terminatecall()">
-                    Завершить
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
+            <v-btn
+                    @click="call(props.item)"
+                    rounded
+                    color="success"
+                    v-on="on"
+                    :return-value.sync="props.item.phone"
+            >
+              <v-icon>{{ "mdi-phone" }}</v-icon>
+              Звонок
+            </v-btn>
           </template>
           <template v-slot:item.doNotCall="props">
             <v-btn
-              @click="block(props.item)"
-              rounded
-              color="error"
-              :return-value.prop="props.item.doNotCall"
+                    @click="block(props.item)"
+                    rounded
+                    color="error"
+                    :return-value.prop="props.item.doNotCall"
             >
               <v-icon>{{ "mdi-block" }}</v-icon>
               Больше не вызывать
@@ -125,12 +101,12 @@
           </template>
           <template v-slot:item.orderComment="props">
             <v-edit-dialog
-              :return-value.sync="props.item.orderComment"
-              large
-              persistent
-              @save="save(props.item)"
-              @cancel="cancel"
-              @open="open"
+                    :return-value.sync="props.item.orderComment"
+                    large
+                    persistent
+                    @save="save(props.item)"
+                    @cancel="cancel"
+                    @open="open"
             >
               <div>{{ props.item.orderComment }}</div>
               <template v-slot:input>
@@ -138,11 +114,10 @@
               </template>
               <template v-slot:input>
                 <v-text-field
-                  v-model="props.item.orderComment"
-                  label="Редактировать"
-                  single-line
-                  counter
-                  autofocus
+                        v-model="props.item.orderComment"
+                        label="Редактировать"
+                        single-line
+                        autofocus
                 ></v-text-field>
               </template>
             </v-edit-dialog>
@@ -152,54 +127,29 @@
       <v-tab>Клиенты, которым никогда не звонили</v-tab>
       <v-tab-item>
         <v-data-table
-          v-bind:key="clients"
-          :items="clients"
-          v-for="clients in infoNever"
-          :headers="headers"
+                v-bind:key="clients"
+                :items="clients"
+                v-for="clients in infoNever"
+                :headers="headers"
         >
-
           <template v-slot:item.phone="props">
-            <v-dialog v-model="dialogCall" persistent max-width="290">
-            <template  v-slot:activator="{ on }">
             <v-btn
-              @click="call(props.item)"
-              rounded
-              color="success"
-              v-on="on"
-              :return-value.sync="props.item.phone"
+                    @click="call(props.item)"
+                    rounded
+                    color="success"
+                    v-on="on"
+                    :return-value.sync="props.item.phone"
             >
               <v-icon>{{ "mdi-phone" }}</v-icon>
               Звонок
             </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="headline">
-                Идет звонок
-              </v-card-title>
-              <v-card-text>
-                Вызываемый абонент: {{abonent}}
-                <br>
-                {{callTime}}
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                        rounded
-                        color="error"
-                        @click="terminatecall()">
-                  Завершить
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-            </v-dialog>
           </template>
-
           <template v-slot:item.doNotCall="props">
             <v-btn
-              @click="block(props.item)"
-              rounded
-              color="error"
-              :return-value.prop="props.item.doNotCall"
+                    @click="block(props.item)"
+                    rounded
+                    color="error"
+                    :return-value.prop="props.item.doNotCall"
             >
               <v-icon>{{ "mdi-block" }}</v-icon>
               Больше не вызывать
@@ -207,12 +157,12 @@
           </template>
           <template v-slot:item.orderComment="props">
             <v-edit-dialog
-              :return-value.sync="props.item.orderComment"
-              large
-              persistent
-              @save="save(props.item)"
-              @cancel="cancel"
-              @open="open"
+                    :return-value.sync="props.item.orderComment"
+                    large
+                    persistent
+                    @save="save(props.item)"
+                    @cancel="cancel"
+                    @open="open"
             >
               <div>{{ props.item.orderComment }}</div>
               <template v-slot:input>
@@ -220,11 +170,10 @@
               </template>
               <template v-slot:input>
                 <v-text-field
-                  v-model="props.item.orderComment"
-                  label="Редактировать"
-                  single-line
-                  counter
-                  autofocus
+                        v-model="props.item.orderComment"
+                        label="Редактировать"
+                        single-line
+                        autofocus
                 ></v-text-field>
               </template>
             </v-edit-dialog>
@@ -258,7 +207,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-      <audio id="remoteAudio" autoPlay></audio>
+    <audio id="remoteAudio" autoPlay></audio>
   </v-app>
 </template>
 
@@ -484,14 +433,12 @@ export default {
       dialog: true,
       dialogCall: false,
       callTime: '',
-      Client: [],
       info: null,
       infoToday: null,
       infoNever: null,
       snack: false,
       snackColor: '',
       snackText: '',
-      pagination: {},
       headers: [
         {
           text: 'Фамилия',
