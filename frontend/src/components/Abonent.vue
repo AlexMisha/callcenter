@@ -11,6 +11,12 @@
         ></v-progress-circular>Подключение к серверу
       </v-card>
     </v-dialog>
+    <v-btn
+            @click="update()"
+            rounded
+            color="primary">
+      Обновить
+    </v-btn>
     <v-tabs fixed-tabs v-if="dialog==false">
       <v-tab>Клиенты</v-tab>
       <v-tab-item>
@@ -302,12 +308,11 @@ export default {
   },
   methods: {
     save(item) {
-      this.snack = true;
-      this.snackColor = 'success';
-      this.snackText = 'Данные сохранены';
+      let url = 'api/clients/'+item.id;
+      if (item.id==undefined) url = item._links.self.href;
       axios({
         method: 'PATCH',
-        url: '/api/clients/'+item.id,
+        url: url,
         data: {orderComment: item.orderComment},
         headers: {
           'Content-Type': 'application/json',
@@ -315,9 +320,12 @@ export default {
           'Authorization': sessionStorage.token,
         },
       })
-          .then(function(response) {
-            console.log(response);
-          })
+          .then((response) => (
+            (console.log(response)),
+            (this.snack = true),
+            (this.snackColor = 'success'),
+            (this.snackText = 'Данные сохранены')
+          ))
           .catch(
               (error) => (
                 console.log(error),
@@ -338,9 +346,11 @@ export default {
       this.snackText = 'Окно открыто';
     },
     block(item) {
+      let url = 'api/clients/'+item.id;
+      if (item.id==undefined) url = item._links.self.href;
       axios({
         method: 'PATCH',
-        url: '/api/clients/'+item.id,
+        url: url,
         data: {doNotCall: true},
         headers: {
           'Content-Type': 'application/json',
@@ -348,9 +358,12 @@ export default {
           'Authorization': sessionStorage.token,
         },
       })
-          .then(function(response) {
-            console.log(response);
-          })
+          .then((response) => (
+            (console.log(response)),
+            (this.snack = true),
+            (this.snackColor = 'success'),
+            (this.snackText = 'Абонент больше не будет вызываться')
+          ))
           .catch(
               (error) => (
                 console.log(error),
@@ -359,9 +372,6 @@ export default {
                 (this.snackText = 'Ошибка сохранения данных')
               ),
           );
-      this.snack = true;
-      this.snackColor = 'success';
-      this.snackText = 'Абонент больше не будет вызываться';
     },
     call(item) {
       this.callTime='';
@@ -425,6 +435,63 @@ export default {
     terminatecall() {
       this.dialogCall = false;
       this.ua.terminateSessions();
+    },
+    update() {
+      this.loading = 'Обновление данных';
+      this.dialog = true;
+      axios({
+        method: 'GET',
+        url: 'api/clients/search/findByDoNotCallIsNullOrDoNotCallIsFalse',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) => ((this.info = response.data._embedded),
+          (this.dialog = false)))
+          .catch(
+              (error) => (
+                (this.snack = true),
+                (this.snackColor = 'error'),
+                (this.snackText = 'Ошибка подключения к серверу'),
+                (this.dialog = false)
+              ),
+          );
+      axios({
+        method: 'GET',
+        url: 'clients/findNotCalledToday',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) => (this.infoToday = response))
+          .catch(
+              (error) => (
+                (this.snack = true),
+                (this.snackColor = 'error'),
+                (this.snackText = 'Ошибка подключения к серверу')
+              ),
+          );
+      axios({
+        method: 'GET',
+        url: 'clients/findNeverCalled',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'Authorization': sessionStorage.token,
+        },
+      })
+          .then((response) => (this.infoNever = response))
+          .catch(
+              (error) => (
+                (this.snack = true),
+                (this.snackColor = 'error'),
+                (this.snackText = 'Ошибка подключения к серверу')
+              ),
+          );
     },
   },
 
