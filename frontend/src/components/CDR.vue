@@ -30,9 +30,14 @@ export default {
       info: null,
       headers: [
         {
-          text: 'accountCode',
+          text: 'Оператор',
           align: 'left',
-          value: 'accountCode',
+          value: 'src',
+        },
+        {
+          text: 'Клиент',
+          align: 'left',
+          value: 'dest',
         },
         {text: 'Date', value: 'callDate'},
         {text: 'Duration', value: 'duration'},
@@ -47,7 +52,7 @@ export default {
       headers: {
         'Content-Type': 'application/json',
         'Accept': '*/*',
-        'Authorization': localStorage.token,
+        'Authorization': sessionStorage.token,
       },
     }).then((response) => (this.info = response.data._embedded));
   },
@@ -59,7 +64,7 @@ export default {
         headers: {
           'Content-Type': 'application/json',
           'Accept': '*/*',
-          'Authorization': localStorage.token,
+          'Authorization': sessionStorage.token,
         },
         responseType: 'blob',
       }).then((response) => {
