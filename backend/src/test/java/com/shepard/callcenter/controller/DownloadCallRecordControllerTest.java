@@ -1,11 +1,11 @@
 package com.shepard.callcenter.controller;
 
-import com.shepard.callcenter.config.CallcenterProperties;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Alex Misha
  */
+@SpringBootTest
 class DownloadCallRecordControllerTest {
-    private static final CallcenterProperties CALLCENTER_PROPERTIES = new CallcenterProperties();
     private static final String TEST_STRING = "testData";
 
-    private final DownloadCallRecordController controller = new DownloadCallRecordController(CALLCENTER_PROPERTIES);
-
-    @BeforeAll
-    static void beforeAll() {
-        CALLCENTER_PROPERTIES.setCallRecordsPath("/tmp/");
-    }
+    @Autowired
+    private DownloadCallRecordController controller;
 
     @Test
     void downloadOk() throws IOException {
@@ -40,7 +36,7 @@ class DownloadCallRecordControllerTest {
     }
 
     @Test
-    void downloadNotFound() throws IOException {
+    void downloadNotFound() {
         final ResponseEntity<Resource> download = controller.download("notFoundFile");
 
         assertThat(download.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
