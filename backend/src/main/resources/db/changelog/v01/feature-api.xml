@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
+		logicalFilePath="feature-api.xml"
+		context="prod">
+	<changeSet id="feature-api.xml" author="Alex Misha">
+		<tagDatabase tag="feature-api.xml" />
+	</changeSet>
+
+	<changeSet id="ct.operator" author="Alex Misha">
+		<createTable tableName="operator">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="login" type="varchar()">
+				<constraints unique="true" nullable="false" />
+			</column>
+			<column name="first_name" type="varchar()">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_name" type="varchar()">
+				<constraints nullable="false" />
+			</column>
+			<column name="middle_name" type="varchar()" />
+			<column name="phone" type="varchar()">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<rollback>
+			<dropTable tableName="operator" cascadeConstraints="true" />
+		</rollback>
+	</changeSet>
+	<changeSet id="cs.operator" author="Alex Misha">
+		<createSequence sequenceName="sq_operator" startValue="1" incrementBy="1" />
+		<rollback>
+			<dropSequence sequenceName="sq_operator" />
+		</rollback>
+	</changeSet>
+
+	<changeSet id="ct.operator_password" author="Alex Misha">
+		<createTable tableName="operator_password">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="password" type="varchar()">
+				<constraints nullable="false" />
+			</column>
+			<column name="operator_id" type="bigint">
+				<constraints nullable="false" referencedTableName="operator" referencedColumnNames="id" foreignKeyName="fk_operator_password" />
+			</column>
+		</createTable>
+		<rollback>
+			<dropTable tableName="operator_password" cascadeConstraints="true" />
+		</rollback>
+	</changeSet>
+	<changeSet id="cs.operator_password" author="Alex Misha">
+		<createSequence sequenceName="sq_operator_password" startValue="1" incrementBy="1" />
+		<rollback>
+			<dropSequence sequenceName="sq_operator_password" />
+		</rollback>
+	</changeSet>
+
+	<changeSet id="ct.client" author="Alex Misha">
+		<createTable tableName="client">
+			<column name="id" type="bigint">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="first_name" type="varchar()">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_name" type="varchar()">
+				<constraints nullable="false" />
+			</column>
+			<column name="middle_name" type="varchar()" />
+			<column name="phone" type="varchar()" />
+			<column name="do_not_call" type="boolean" defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="order_comment" type="varchar()" />
+		</createTable>
+		<rollback>
+			<dropTable tableName="client" cascadeConstraints="true" />
+		</rollback>
+	</changeSet>
+	<changeSet id="cs.client" author="Alex Misha">
+		<createSequence sequenceName="sq_client" startValue="1" incrementBy="1" />
+		<rollback>
+			<dropSequence sequenceName="sq_client" />
+		</rollback>
+	</changeSet>
+</databaseChangeLog>
