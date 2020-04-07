@@ -32,7 +32,7 @@ public class DownloadCallRecordController {
     }
 
     @GetMapping(value = "/{fileName}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> download(@PathVariable("fileName") String fileName) throws FileNotFoundException {
+    public ResponseEntity<Resource> download(@PathVariable("fileName") String fileName) {
         final Path path = Paths.get(callcenterProperties.getCallRecordsPath() + fileName);
         if (!Files.exists(path)) {
             log.warn("Attempt to download non-existing file " + path);
@@ -40,10 +40,15 @@ public class DownloadCallRecordController {
         }
         final File file = path.toFile();
 
-        final InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-        return ResponseEntity.ok()
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
-                .body(resource);
+        try {
+            final InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+            return ResponseEntity.ok()
+                    .contentLength(file.length())
+                    .contentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                    .body(resource);
+        } catch (FileNotFoundException e) {
+            log.error("Suspicious file not found", e);
+            return ResponseEntity.notFound().build();
+        }
     }
 }
