@@ -15,7 +15,7 @@
 	</parent>
 	<groupId>com.shepard</groupId>
 	<artifactId>callcenter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>callcenter</name>
 	<description>Call center project with asterisk</description>
 
