@@ -15,7 +15,7 @@
 		<java.version>1.11</java.version>
 		<hibernate.modelgen.version>5.2.14.Final</hibernate.modelgen.version>
 		<callcenter.deploy.path>${project.build.directory}</callcenter.deploy.path>
-		<hibernate.validator.version>6.1.2.Final</hibernate.validator.version>
+		<hibernate.validator.version>6.1.5.Final</hibernate.validator.version>
 		<swagger.version>3.0.0-SNAPSHOT</swagger.version>
 		<swagger.ui.version>2.9.2</swagger.ui.version>
 		<jwt.version>3.10.0</jwt.version>
